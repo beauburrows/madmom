@@ -18,6 +18,9 @@ from ..ml.nn import average_predictions
 from ..processors import (OnlineProcessor, ParallelProcessor, Processor,
                           SequentialProcessor)
 
+# OSC STUFF \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+import OSC
+
 
 # classes for tracking (down-)beats with RNNs
 class RNNBeatProcessor(SequentialProcessor):
@@ -1010,6 +1013,7 @@ class DBNBeatTrackingProcessor(OnlineProcessor):
             Detected beat position [seconds].
 
         """
+
         # reset to initial state
         if reset:
             self.reset()
@@ -1042,11 +1046,22 @@ class DBNBeatTrackingProcessor(OnlineProcessor):
                 display.append('| X ')
             else:
                 display.append('|   ')
+
             self.beat_counter -= 1
             # display tempo
             display.append('| %5.1f | ' % self.tempo)
             sys.stderr.write('\r%s' % ''.join(display))
             sys.stderr.flush()
+
+        #SEND ACTIVATIONS OVER OSC \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+        c = OSC.OSCClient()
+        c.connect(('127.0.0.1', 7000))   # connect
+        # message: tempo
+        oscmsgA = OSC.OSCMessage()
+        oscmsgA.setAddress("/activs")
+        oscmsgA.append(activations)
+        c.send(oscmsgA)
+
         # forward path often reports multiple beats close together, thus report
         # only beats more than the minimum interval apart
         beats_ = []
@@ -1062,8 +1077,24 @@ class DBNBeatTrackingProcessor(OnlineProcessor):
                 self.last_beat = cur_beat
                 # append to beats
                 beats_.append(cur_beat)
+
+                #SEND BEATS OVER OSC \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+                #c = OSC.OSCClient()
+                #c.connect(('127.0.0.1', 7000))   # connect
+                # message: tempo
+                oscmsg = OSC.OSCMessage()
+                oscmsg.setAddress("/tempo")
+                oscmsg.append(self.tempo)
+                c.send(oscmsg)
+                # message beat strength
+                oscmsgB = OSC.OSCMessage()
+                oscmsgB.setAddress("/beat")
+                oscmsgB.append(activations * 10)
+                c.send(oscmsgB)
+                #print('beat?')
         # increase counter
         self.counter += len(activations)
+
         # return beat(s)
         return np.array(beats_)
 

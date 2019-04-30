@@ -1400,6 +1400,8 @@ class Stream(object):
         import pyaudio
         # set attributes
         self.sample_rate = sample_rate
+        #DANGER
+        self.sample_rate = 44100;
         self.num_channels = 1 if num_channels is None else num_channels
         self.dtype = dtype
         if frame_size:
@@ -1414,11 +1416,13 @@ class Stream(object):
         # init PyAudio
         self.pa = pyaudio.PyAudio()
         # init a stream to read audio samples from
+        
         self.stream = self.pa.open(rate=self.sample_rate,
                                    channels=self.num_channels,
                                    format=pyaudio.paFloat32, input=True,
                                    frames_per_buffer=self.hop_size,
                                    start=True)
+
         # create a buffer
         self.buffer = BufferProcessor(self.frame_size)
         # frame index counter
