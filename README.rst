@@ -1,7 +1,9 @@
 Beau's Notes:
 
-Make sure to install pyosc for OSC support: 
-pip install pyosc
+Make sure to install pyosc for OSC support:::
+
+    pip install pyosc
+
 
 Added OSC output for DBNBeatTracker by modifying beats.py  (in the madmom>features folder). This sends out some OSC data on the detected beats/transients on port 7000 to localhost
 
