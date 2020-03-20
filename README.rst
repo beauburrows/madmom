@@ -1,11 +1,16 @@
 Beau's Notes:
 
+Make sure to install pyosc for OSC support: 
+pip install pyosc
+
 Added OSC output for DBNBeatTracker by modifying beats.py  (in the madmom>features folder). This sends out some OSC data on the detected beats/transients on port 7000 to localhost
 
 To run it, go to the bin folder and run DBNBeatTracker with the online argument (for python 2.7):
 python DBNBeatTracker online
 
 Note that Dante WDM audio drivers don't seem to work with PyAudio, so currently using LoopBeAudio to test.
+
+The OSC is in madmom/features/beats.py and audio signal adjustments are in madmom/audio/signal.py
 
 ======
 madmom
